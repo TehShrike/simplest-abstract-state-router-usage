@@ -1,0 +1,30 @@
+<html>
+	<head>
+		<title>Simplest abstract-state-router usage</title>
+
+		<script src="http://wzrd.in/standalone/ractive-state-router@6.0.0" defer></script>
+		<script src="http://wzrd.in/standalone/abstract-state-router@5.12.2" defer></script>
+		<script src="http://cdn.ractivejs.org/0.7.3/ractive.js" defer></script>
+		<script defer>
+			var stateRouter = abstractStateRouter(ractiveStateRouter, '#app-content')
+
+			stateRouter.addState({
+				name: 'app',
+			  template: '#app',
+			  route: '/app/'
+			})
+		</script>
+	</head>
+	<body>
+		<div id="app-content">
+
+		</div>
+		<script id='app' type='text/ractive'>
+		<nav>
+			<ul>
+		  	<a href="{{makePath('app.page1')}}">Page 1</a>
+		  </ul>
+		</nav>
+		</script>
+	</body>
+</html>
