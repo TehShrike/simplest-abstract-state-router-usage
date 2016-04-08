@@ -1,30 +1,171 @@
 <html>
 	<head>
 		<title>Simplest abstract-state-router usage</title>
-
-		<script src="http://wzrd.in/standalone/ractive-state-router@6.0.0" defer></script>
-		<script src="http://wzrd.in/standalone/abstract-state-router@5.12.2" defer></script>
-		<script src="http://cdn.ractivejs.org/0.7.3/ractive.js" defer></script>
-		<script defer>
-			var stateRouter = abstractStateRouter(ractiveStateRouter, '#app-content')
-
-			stateRouter.addState({
-				name: 'app',
-			  template: '#app',
-			  route: '/app/'
-			})
-		</script>
+		<link rel="stylesheet" href="./bootswatch.slate.3.3.6.min.css">
 	</head>
 	<body>
+		<!-- This is just the shell where the abstract-state-router will place the content. -->
 		<div id="app-content">
 
 		</div>
+
+
+		<!-- These are the templates that I tell Ractive to use for each of the states. -->
 		<script id='app' type='text/ractive'>
-		<nav>
-			<ul>
-		  	<a href="{{makePath('app.page1')}}">Page 1</a>
-		  </ul>
-		</nav>
+			<nav class="navbar navbar-inverse">
+				<div class="container-fluid">
+					<ul class="nav navbar-nav">
+						<li decorator="active:app.page1">
+							<a href="{{makePath('app.page1')}}">
+								Page 1
+							</a>
+						</li>
+						<li decorator="active:app.page2">
+							<a href="{{makePath('app.page2')}}">
+								Page 2
+							</a>
+						</li>
+						<li decorator="active:app.docs">
+							<a href="{{makePath('app.docs')}}">
+								Docs
+							</a>
+						</li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="https://github.com/TehShrike/simplest-abstract-state-router-usage/blob/master/index.html">Source code!</a>
+						</li>
+					</ul>
+				</div>
+			</nav>
+			<div class="container">
+				<ui-view></ui-view>
+
+				<div class="row">
+					<div class="col-xs-12" style="margin-top: 5em">
+						<p class="text-muted"><small>And this is a footer.  Copyright {{currentYear + variance}}, licensed WTFPL</small></p>
+					</div>
+				</div>
+			</div>
+		</script>
+
+		<script id='app-page1' type='text/ractive'>
+			<div class="row">
+				<div class="col-xs-12">
+					<h1>I'm page 1!</h1>
+				</div>
+			</div>
+		</script>
+
+		<script id='app-page2' type='text/ractive'>
+			<div class="row">
+				<div class="col-xs-12">
+					<h1>Welcome to page 2.</h1>
+					<p class="lead">
+						The page with the deetz.
+					</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-offset-0 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-3 col-sm-6 col-xs-offset-1 col-xs-10">
+					<p>
+						This project is meant to serve as a demo for the minimum amount of work to get the abstract-state-router working.  No build steps, no transpilers.
+					</p>
+					<p>
+						You probably won't want to build an app like this for very long (see the <a href="http://tehshrike.github.io/state-router-example/">state router examples</a> for implementations that would be better to base an app off of), but it's still a legit bootstrap.
+					</p>
+				</div>
+				<div class="col-lg-offset-0 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-3 col-sm-6 col-xs-offset-1 col-xs-10">
+					<p>
+						I did use Bootstrap, but mostly so that this site wouldn't look butt-ugly.  You can ignore the Bootstrap classes, abstract-state-router has no kind of dependence on it.
+					</p>
+					<p>
+						Looking at the code, you can see I use <a href="http://www.ractivejs.org/">Ractive</a> for the templating.  That is also totally up to you - you can use one of the <a href="https://github.com/TehShrike/abstract-state-router#current-renderer-implementations">currently-implemented</a> templating engines, or <a href="https://github.com/TehShrike/abstract-state-router/blob/master/renderer.md">bring any other you prefer</a>.
+					</p>
+					<p>
+						Behold, the power of Ractive!
+					</p>
+					<ul>
+						{{#coolArray}}
+							<li>
+								<p class="text-{{.}}">Woah!</p>
+							</li>
+						{{/coolArray}}
+					</ul>
+				</div>
+			</div>
+		</script>
+
+		<script id='app-docs' type='text/ractive'>
+			Check out the <a href="https://github.com/TehShrike/abstract-state-router">abstract-state-router</a> for all the documentation.  If you have any questions, open a Github issue, or <a href="https://twitter.com/TehShrike">hit me up on Twitter!</a>
+		</script>
+
+
+
+		<!-- These are the dependencies you need to use the abstract-state-router and Ractive together -->
+		<script src="http://wzrd.in/standalone/ractive-state-router@6.0.0"></script>
+		<script src="http://wzrd.in/standalone/abstract-state-router@5.12.2"></script>
+		<script src="http://cdn.ractivejs.org/0.7.3/ractive.js"></script>
+
+
+
+
+		<!-- This is the code that makes it all happen! -->
+		<script>
+			var ractiveStateRenderer = ractiveStateRouter(Ractive)
+			var stateRouter = abstractStateRouter(ractiveStateRenderer, '#app-content')
+
+			stateRouter.addState({
+				name: 'app',
+				template: '#app',
+				route: '/app',
+				resolve: function(data, params, cb) {
+					cb(null, {
+						currentYear: new Date().getFullYear(),
+						variance: 0
+					})
+				},
+				activate: function(context) {
+					context.domApi.set('currentYear', context.content.currentYear)
+
+					var interval = setInterval(function() {
+						var direction = Math.random() > 0.5 ? 1 : -1
+						var newVariance = context.domApi.get('variance') + (direction * Math.round(Math.random() * 3))
+						context.domApi.set('variance', newVariance)
+					}, 2000)
+
+					context.on('destroy', function() {
+						clearInterval(interval)
+					})
+				}
+			})
+
+			stateRouter.addState({
+				name: 'app.page1',
+				template: '#app-page1',
+				route: '/page1'
+			})
+
+			stateRouter.addState({
+				name: 'app.page2',
+				template: '#app-page2',
+				route: '/page2',
+				activate: function(context) {
+					context.domApi.set('coolArray', [
+						'success',
+						'info',
+						'warning'
+					])
+				}
+			})
+
+			stateRouter.addState({
+				name: 'app.docs',
+				template: '#app-docs',
+				route: '/documentation'
+			})
+
+			stateRouter.evaluateCurrentRoute('app.page1')
 		</script>
 	</body>
 </html>
