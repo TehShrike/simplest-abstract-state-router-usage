@@ -1,6 +1,6 @@
 Want to use the abstract-state-router, and almost nothing else?  Here's the demo for you.
 
-**[See it here!](http://tehshrike.github.io/simplest-abstract-state-router-usage)**
+**[See it here!](//tehshrike.github.io/simplest-abstract-state-router-usage)**
 
 ## Slightly more description
 
